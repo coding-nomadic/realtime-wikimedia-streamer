@@ -12,22 +12,31 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class WikimediaProducer {
+
     @Value("${spring.kafka.topic.name}")
     private String topicName;
 
     @Value("${wikimedia.url}")
     private String wikimediaUrl;
-    private KafkaTemplate<String, String> kafkaTemplate;
 
-    public WikimediaProducer(String topicName, KafkaTemplate<String, String> kafkaTemplate) {
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    public WikimediaProducer(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
     public void sendMessage() throws InterruptedException {
         EventHandler eventHandler = new WikimediaHandler(kafkaTemplate, topicName);
-        EventSource.Builder builder = new EventSource.Builder(eventHandler, URI.create(wikimediaUrl));
-        EventSource eventSource = builder.build();
+        EventSource eventSource = buildEventSource(eventHandler);
         eventSource.start();
+        waitTenMinutes();
+    }
+
+    private EventSource buildEventSource(EventHandler eventHandler) {
+        return new EventSource.Builder(eventHandler, URI.create(wikimediaUrl)).build();
+    }
+
+    private void waitTenMinutes() throws InterruptedException {
         TimeUnit.MINUTES.sleep(10);
     }
 }
