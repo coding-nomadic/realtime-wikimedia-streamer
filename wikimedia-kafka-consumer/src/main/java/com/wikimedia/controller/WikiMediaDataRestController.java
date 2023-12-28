@@ -39,7 +39,7 @@ public class WikiMediaDataRestController {
 
     @GetMapping("/all")
     public ResponseEntity<List<WikiMediaData>> getMediaDataByAll() {
-        final List<WikiMediaData> entity = repository.findAll();
-        return entity != null ? ResponseEntity.ok(entity) : ResponseEntity.notFound().build();
+        final List<WikiMediaData> entities = repository.findAll();
+        return entities.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok().body(entities);
     }
 }
