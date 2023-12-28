@@ -28,10 +28,12 @@ public class WikimediaHandler implements EventHandler {
 
     @Override
     public void onMessage(String event, MessageEvent messageEvent) throws Exception {
-        log.info("New event data -> {}", messageEvent.getData());
-        Thread.sleep(1000);
+        log.info("Received new event data: {}", messageEvent.getData());
+        // Publishing message to Kafka topic at a break of One second.
+        final int sleepDurationMillis = 1000;
+        Thread.sleep(sleepDurationMillis);
         producerTemplate.sendBody("direct:start", messageEvent.getData());
-        log.info("Sent message to Kafka Topic successfully !");
+        log.info("Message sent to Kafka Topic successfully!");
     }
 
     @Override
@@ -40,7 +42,7 @@ public class WikimediaHandler implements EventHandler {
 
     @Override
     public void onError(Throwable throwable) {
-        log.error("Error in WikimediaHandler", throwable.getMessage());
+        log.error("Error in WikimediaHandler: {}", throwable.getMessage());
     }
 
 }
