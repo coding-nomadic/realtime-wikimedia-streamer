@@ -40,7 +40,7 @@ public class WikimediaHandler implements EventHandler {
 
     @Override
     public void onError(Throwable throwable) {
-        og.error("Error in WikimediaHandler", throwable.getMessage());
+        log.error("Error in WikimediaHandler", throwable.getMessage());
     }
 
 }
