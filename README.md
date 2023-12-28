@@ -2,8 +2,6 @@
 Create Topic -
 
 .\bin\windows\kafka-topics.bat --create --topic wikimedia-change --bootstrap-server localhost:9092
-Created topic topic-example
-
 
 
 
