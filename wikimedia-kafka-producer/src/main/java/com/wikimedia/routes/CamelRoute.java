@@ -23,9 +23,7 @@ public class CamelRoute extends RouteBuilder {
                 .log("Exception caught: ${exception.message}")
                 .handled(true)
                 .end()
-                .log("Wikimedia route started")
                 .log(String.format("Received message for Kafka Topic -> %s", "${body}"))
-                .to(String.format("kafka:%s?brokers=%s", topicName, brokerUrl))
-                .log("Message sent to Kafka Topic successfully");
+                .to(String.format("kafka:%s?brokers=%s", topicName, brokerUrl));
     }
 }
