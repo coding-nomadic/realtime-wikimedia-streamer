@@ -13,14 +13,12 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class WikimediaProducer {
 
-    @Value("${wikimedia.url}")
-    private String wikimediaUrl;
+    private final ProducerTemplate producerTemplate;
+    private final String wikimediaUrl;
 
-
-    private ProducerTemplate producerTemplate;
-
-    public WikimediaProducer(ProducerTemplate producerTemplate) {
+    public WikimediaProducer(ProducerTemplate producerTemplate, @Value("${wikimedia.url}") String wikimediaUrl) {
         this.producerTemplate = producerTemplate;
+        this.wikimediaUrl = wikimediaUrl;
     }
 
     public void sendMessage() throws InterruptedException {
