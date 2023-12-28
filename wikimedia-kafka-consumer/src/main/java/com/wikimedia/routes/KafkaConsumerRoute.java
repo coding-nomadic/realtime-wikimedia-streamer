@@ -1,10 +1,6 @@
 package com.wikimedia.routes;
 
 
-import com.wikimedia.entities.WikiMediaData;
-import com.wikimedia.models.WikiMedia;
-import com.wikimedia.utils.JsonUtils;
-import com.wikimedia.utils.TransformerUtils;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,21 +10,34 @@ public class KafkaConsumerRoute extends RouteBuilder {
 
 
     @Value("${kafka.topic.name}")
-    private String topicName;
+    private final String topicName;
 
     @Value("${kafka.broker.url}")
-    private String brokerUrl;
+    private final String brokerUrl;
 
     @Value("${mongodb.database}")
-    private String database;
+    private final String database;
 
     @Value("${mongodb.collection}")
-    private String collection;
+    private final String collection;
+
+    public KafkaConsumerRoute(
+            @Value("${kafka.topic.name}") final String topicName,
+            @Value("${kafka.broker.url}") final String brokerUrl,
+            @Value("${mongodb.database}") final String database,
+            @Value("${mongodb.collection}") final String collection) {
+        this.topicName = topicName;
+        this.brokerUrl = brokerUrl;
+        this.database = database;
+        this.collection = collection;
+    }
 
     @Override
     public void configure() throws Exception {
-        from("kafka:" + topicName + "?brokers=" + brokerUrl).routeId("wikimedia-route").log("Received message from Kafka Topic : ${body}").process(exchange -> {
-            exchange.getMessage().setBody(exchange.getIn().getBody());
-        }).toF("mongodb:%s?database=%s&collection=%s&operation=insert", database, database, collection);
+        from(String.format("kafka:%s?brokers=%s", topicName, brokerUrl))
+                .routeId("wikimedia-route")
+                .log("Received message from Kafka Topic: ${body}")
+                .process(exchange -> exchange.getMessage().setBody(exchange.getIn().getBody()))
+                .toF("mongodb:%s?database=%s&collection=%s&operation=insert", collection, database, collection);
     }
 }
