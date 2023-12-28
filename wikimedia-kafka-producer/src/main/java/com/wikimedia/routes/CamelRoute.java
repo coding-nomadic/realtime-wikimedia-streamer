@@ -7,16 +7,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class CamelRoute extends RouteBuilder {
 
-    @Value("${kafka.topic.name}")
+    public static final String KAFKA_TOPIC_NAME = "${kafka.topic.name}";
+    public static final String KAFKA_BROKER_URL = "${kafka.broker.url}";
+
+    @Value(KAFKA_TOPIC_NAME)
     private String topicName;
 
-    @Value("${kafka.broker.url}")
+    @Value(KAFKA_BROKER_URL)
     private String brokerUrl;
 
     @Override
     public void configure() throws Exception {
         from("direct:start").routeId("wikimedia-route")
-                .log("Received message for Kafka Topic -> ${body}")
-                .to("kafka:" + topicName + "?brokers=" + brokerUrl);
+                .onException(Exception.class)
+                .log("Exception caught: ${exception.message}")
+                .handled(true)
+                .end()
+                .log("Wikimedia route started")
+                .log(String.format("Received message for Kafka Topic -> %s", "${body}"))
+                .to(String.format("kafka:%s?brokers=%s", topicName, brokerUrl))
+                .log("Message sent to Kafka Topic successfully");
     }
 }
